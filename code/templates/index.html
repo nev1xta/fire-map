@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="map" class="map container">
+    <h1 style="text-align:center">Карта</h1>
+<script src="https://api-maps.yandex.ru/2.1/
+?lang=ru_RU&apikey=258ad250-89ff-470b-9af6-d7bb2fd9390f">
+</script>
+</div>
+<script type="text/javascript">
+function init() {
+    let map = new ymaps.Map('map', {
+        center: [43.03473789869346,44.61977768856025],
+        zoom: 16
+
+    });
+}
+ymaps.ready(init);
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+.ya_map {
+	font-family: arial;
+	font-size: 12px;
+	color: #454545;
+}
+
+#map {
+	width: 800px;
+	height: 660px;
+}
