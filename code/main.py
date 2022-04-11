@@ -4,8 +4,6 @@ from werkzeug.utils import redirect
 
 from data import db_session
 from data.users import User
-from data.news import News
-from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 
 app = Flask(__name__)
