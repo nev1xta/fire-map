@@ -8,7 +8,7 @@
     id_position (id должности из таблицы POSITION)
 
 ТАБЛИЦА POSITION:
-    id_position
+    id
     name_position (название должности)
     # координаты карты
     x0 (левой верхней)
