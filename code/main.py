@@ -67,7 +67,7 @@ def reqister():
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = User(
-            name=form.name.data,
+            fio=form.fio.data,
             login=form.login.data,
         )
         user.set_password(form.password.data)
