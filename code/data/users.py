@@ -14,7 +14,7 @@ class User(SqlAlchemyBase, UserMixin):
     login = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-    position_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('position.id'))
+    position_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('positions.id'))
 
 
     def __repr__(self):
