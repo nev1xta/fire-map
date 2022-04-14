@@ -1,5 +1,4 @@
 import sqlalchemy
-from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 
 
@@ -19,8 +18,8 @@ class Position(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     name_position = sqlalchemy.Column(sqlalchemy.String)
-    x0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    y0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    x1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    y1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    x0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    y0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    x1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    y1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     complited = sqlalchemy.Column(sqlalchemy.Integer, default=0)
