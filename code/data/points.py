@@ -1,6 +1,6 @@
 import sqlalchemy
-from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
+
 
 # ТАБЛИЦА POINTS:
 #     id (id метки)
@@ -14,4 +14,4 @@ class Point(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     description = sqlalchemy.Column(sqlalchemy.Text)
-    image_point = sqlalchemy.Column(sqlalchemy.BLOB, nullable=False)
+    image_point = sqlalchemy.Column(sqlalchemy.BLOB)

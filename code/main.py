@@ -18,14 +18,6 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route("/session_test")
-def session_test():
-    visits_count = session.get('visits_count', 0)
-    session['visits_count'] = visits_count + 1
-    return make_response(
-        f"Вы пришли на эту страницу {visits_count + 1} раз")
-
-
 @app.route('/logout')
 @login_required
 def logout():
