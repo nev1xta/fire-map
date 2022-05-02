@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField
+from wtforms import PasswordField, StringField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -16,3 +16,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+
+
+class PositionForm(FlaskForm):
+    position = SelectField('Укажите должность', choices=[('Сержант', 'Сержант'), ('Лейтинант', 'Лейтинант'),
+                                                         ('Капитан', 'Капитан')])
+    submit = SubmitField('Назначить')
+

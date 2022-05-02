@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, make_response, session
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from werkzeug.utils import redirect
+from werkzeug.exceptions import abort
 
 from data import db_session
 from data.users import User
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, PositionForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -40,9 +41,39 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def index():
-    return render_template("index.html")
+    db_sess = db_session.create_session()
+    users = db_sess.query(User).filter(User.login != 'admin').all()
+    admin = db_sess.query(User).filter(User.login == 'test1').first()
+    # form = PositionForm()
+    if request.method == 'GET':
+        return render_template("index.html", users=users, admin=admin)
+
+
+@app.route('/user/<int:id>',  methods=['GET', 'POST'])
+@login_required
+def get_position(id):
+    form = PositionForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == id).first()
+        if user:
+            form.position.data = user.position_name
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == id).first()
+        if user:
+            user.position_name = form.position.data
+
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('user.html', title='Редактирование пользователя',
+                           form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])

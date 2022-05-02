@@ -2,20 +2,39 @@
 
 {% block content %}
 
-<div id="map" class="map container">
-    <h1 style="text-align:center">Карта</h1>
-<script src="https://api-maps.yandex.ru/2.1/
-?lang=ru_RU&apikey=258ad250-89ff-470b-9af6-d7bb2fd9390f">
-</script>
+<div>
+    <h1 style="text-align:center">Изменить должность участника</h1>
 </div>
-<script type="text/javascript">
-function init() {
-    let map = new ymaps.Map('map', {
-        center: [43.03473789869346,44.61977768856025],
-        zoom: 16
 
-    });
-}
-ymaps.ready(init);
-</script>
+{% for user in users%}
+<div class="col-md6 border rounded m-5 p-2" role="alert">
+
+      <h2> <strong>{{user.fio}}</strong></h2>
+          <div class=" alert alert-dark p-3">
+         <h4>{{user.position_name}}</h4>
+
+        {% if current_user == admin %}
+        <a href="/user/{{ user.id }}" class="btn btn-warning">
+            Изменить
+        </a>
+              </div>
+{% endif %}
+    </div>
+<!--    <div>-->
+<!--         <h2> <strong>{{user.fio}}</strong>-->
+<!--             <h4>{{user.position_name}}</h4>-->
+<!--         </h2>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <select class="custom-select">-->
+<!--          <option selected>Сержант</option>-->
+<!--          <option value="1">Лейтинант</option>-->
+<!--          <option value="2">Капитан</option>-->
+<!--        </select>-->
+<!--    </div>-->
+
+<!--</div>-->
+
+{% endfor %}
+
 {% endblock %}
