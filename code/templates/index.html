@@ -5,21 +5,41 @@
 <div>
     <h1 style="text-align:center">Изменить должность участника</h1>
 </div>
-
+<table class="table table-bordered">
+    <thead class="thead-dark">
+    <tr>
+      <th>#</th>
+      <th>ФИО</th>
+      <th>Должность</th>
+    </tr>
+  </thead> <tbody>
 {% for user in users%}
-<div class="col-md6 border rounded m-5 p-2" role="alert">
 
-      <h2> <strong>{{user.fio}}</strong></h2>
-          <div class=" alert alert-dark p-3">
-         <h4>{{user.position_name}}</h4>
-
-        {% if current_user == admin %}
-        <a href="/user/{{ user.id }}" class="btn btn-warning">
+    <tr class="#">
+      <th scope="row">{{user.id}}</th>
+      <td id="{{user.id}}">{{user.fio}}</td>
+      <td>{{user.position_name}}
+          {% if current_user == admin %}
+ <a href="/user/{{ user.id }}" class="btn btn-warning ml-2">
             Изменить
         </a>
-              </div>
-{% endif %}
-    </div>
+          {% endif %}
+        </td>
+    </tr>
+<!-- -->
+<!--<div class="col-md6 border rounded m-5 p-2" role="alert">-->
+
+<!--      <h2> <strong>{{user.fio}}</strong></h2>-->
+<!--          <div class=" alert alert-dark p-3">-->
+<!--         <h4>{{user.position_name}}</h4>-->
+
+<!--        {% if current_user == admin %}-->
+<!--        <a href="/user/{{ user.id }}" class="btn btn-warning">-->
+<!--            Изменить-->
+<!--        </a>-->
+<!--              </div>-->
+<!--        {% endif %}-->
+<!--</div>-->
 <!--    <div>-->
 <!--         <h2> <strong>{{user.fio}}</strong>-->
 <!--             <h4>{{user.position_name}}</h4>-->
@@ -36,5 +56,7 @@
 <!--</div>-->
 
 {% endfor %}
+         </tbody>
+</table>
 
 {% endblock %}

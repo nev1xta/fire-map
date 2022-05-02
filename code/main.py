@@ -45,7 +45,8 @@ def login():
 def index():
     db_sess = db_session.create_session()
     users = db_sess.query(User).filter(User.login != 'admin').all()
-    admin = db_sess.query(User).filter(User.login == 'test1').first()
+    admin = db_sess.query(User).filter(User.login == 'admin').first()
+    print(admin)
     # form = PositionForm()
     if request.method == 'GET':
         return render_template("index.html", users=users, admin=admin)
