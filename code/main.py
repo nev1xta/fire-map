@@ -37,8 +37,8 @@ def login():
         if user and user.check_password(form.password.data):
             if user != admin:
                 return render_template('login.html',
-                               message="Вы не имеете доступ",
-                               form=form)
+                                       message="Вы не имеете доступ",
+                                       form=form)
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
@@ -52,16 +52,15 @@ def index():
     db_sess = db_session.create_session()
     users = db_sess.query(User).filter(User.login != 'admin').all()
     admin = db_sess.query(User).filter(User.login == 'admin').first()
-    if current_user.is_authenticated:
-        print('dd')
-        if current_user != admin:
-            return redirect('/login')
+
+    if current_user != admin:
+        return redirect('/login')
 
     if request.method == 'GET':
         return render_template("index.html", users=users, admin=admin)
 
 
-@app.route('/user/<int:id>',  methods=['GET', 'POST'])
+@app.route('/user/<int:id>', methods=['GET', 'POST'])
 @login_required
 def get_position(id):
     form = PositionForm()
@@ -85,6 +84,19 @@ def get_position(id):
             abort(404)
     return render_template('user.html', title='Редактирование пользователя',
                            form=form)
+
+
+@app.route('/user_del/<int:id>', methods=['GET', 'POST'])
+@login_required
+def user_del(id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == id).first()
+    if user:
+        db_sess.delete(user)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 @app.route('/register', methods=['GET', 'POST'])
