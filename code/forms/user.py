@@ -5,6 +5,8 @@ from wtforms.validators import DataRequired
 
 class RegisterForm(FlaskForm):
     fio = StringField('Укажите ФИО', validators=[DataRequired()])
+    position = SelectField('Укажите должность', choices=[('Командир отделения', 'Командир отделения'),
+                                                         ('Командир взвода', 'Командир взвода')])
     login = StringField('Придумайте логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
@@ -19,9 +21,8 @@ class LoginForm(FlaskForm):
 
 
 class PositionForm(FlaskForm):
-    # position = SelectField('Укажите должность', choices=[('Сержант', 'Сержант'), ('Лейтинант', 'Лейтинант'),
-    #                                                      ('Капитан', 'Капитан')])
     fio = StringField('Укажите ФИО', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
+
     submit = SubmitField('Изменить')
 
