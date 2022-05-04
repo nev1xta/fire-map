@@ -32,7 +32,13 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.login == form.login.data).first()
+        admin = db_sess.query(User).filter(User.login == 'admin').first()
+
         if user and user.check_password(form.password.data):
+            if user != admin:
+                return render_template('login.html',
+                               message="Вы не имеете доступ",
+                               form=form)
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
@@ -46,8 +52,11 @@ def index():
     db_sess = db_session.create_session()
     users = db_sess.query(User).filter(User.login != 'admin').all()
     admin = db_sess.query(User).filter(User.login == 'admin').first()
-    print(admin)
-    # form = PositionForm()
+    if current_user.is_authenticated:
+        print('dd')
+        if current_user != admin:
+            return redirect('/login')
+
     if request.method == 'GET':
         return render_template("index.html", users=users, admin=admin)
 
@@ -60,15 +69,16 @@ def get_position(id):
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == id).first()
         if user:
-            form.position.data = user.position_name
+            form.fio.data = user.fio
+            form.password.data = user.hashed_password
         else:
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == id).first()
         if user:
-            user.position_name = form.position.data
-
+            user.fio = form.fio.data
+            user.set_password(form.password.data)
             db_sess.commit()
             return redirect('/')
         else:
@@ -97,7 +107,7 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
 
 

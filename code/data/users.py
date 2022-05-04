@@ -16,7 +16,7 @@ class User(SqlAlchemyBase, UserMixin):
     position_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('positions.id'))
 
     def __repr__(self):
-        return f"<User> {self.login}"
+        return f"User {self.id} {self.login}"
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

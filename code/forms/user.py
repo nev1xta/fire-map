@@ -19,7 +19,9 @@ class LoginForm(FlaskForm):
 
 
 class PositionForm(FlaskForm):
-    position = SelectField('Укажите должность', choices=[('Сержант', 'Сержант'), ('Лейтинант', 'Лейтинант'),
-                                                         ('Капитан', 'Капитан')])
-    submit = SubmitField('Назначить')
+    # position = SelectField('Укажите должность', choices=[('Сержант', 'Сержант'), ('Лейтинант', 'Лейтинант'),
+    #                                                      ('Капитан', 'Капитан')])
+    fio = StringField('Укажите ФИО', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    submit = SubmitField('Изменить')
 
