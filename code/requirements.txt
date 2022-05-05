@@ -1,4 +1,9 @@
-flask
-flask_login
-sqlalchemy
-flask_wtf
+Flask==2.0.1
+Flask-Login==0.5.0
+Flask-WTF==1.0.0
+Jinja2==3.0.1
+SQLAlchemy==1.4.31
+Werkzeug==2.0.1
+WTForms==3.0.1
+pygame==2.0.1
+pygame-gui==0.6.4

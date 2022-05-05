@@ -17,7 +17,7 @@ class Position(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    name_position = sqlalchemy.Column(sqlalchemy.String)
+    name_position = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('users.name_position'))
     x0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     y0 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     x1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)

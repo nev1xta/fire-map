@@ -12,11 +12,11 @@ class User(SqlAlchemyBase, UserMixin):
     fio = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     login = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-
+    position_name = sqlalchemy.Column(sqlalchemy.String, default='Рядовой')
     position_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('positions.id'))
 
     def __repr__(self):
-        return f"<User> {self.login} {self.email}"
+        return f"User {self.id} {self.login}"
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
