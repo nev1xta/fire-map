@@ -11,7 +11,7 @@ import pickle
 
 
 clock = pygame.time.Clock()
-pt = '37.6,55.7,round'
+pt = ''
 run = True
 updating = False
 map_file = "map.png"
@@ -323,9 +323,8 @@ def main_cycle(res, login, password):
                     point = event.text
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == save:
-                    map_file = 'map_platoon.png'
-                    update_map(pt)
-                    map_file = 'map.png'
+                    map_image = 'map_platoon.png'
+                    pygame.image.save(screen, map_image)
 
                 if event.ui_element == back:
                     if vz:
