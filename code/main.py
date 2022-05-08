@@ -11,41 +11,46 @@ import pickle
 
 
 clock = pygame.time.Clock()
-pt = ''
 run = True
 updating = False
-map_file = "map.png"
-left_bottom, rith_top = [36.6, 54.6], [38.6, 56.6]
-center_geo = [37.6, 55.7]
+quarter = ['pv', 'lv', 'ln', 'pn']
+map_file_name = "map.png"
 center_py = [225, 225]
-sp = 0.004
-z = None
 points_list = []
+num_map = 0
+login = 'h'
 
 
-def update_map(pt):
-    params1 = {
-        "ll": f'{center_geo[0]},{center_geo[1]}',
-        'spn': f'{sp},{sp}',
-        "l": 'sat',
-        'size': '450,450',
-        "pt": pt,
-        'z': z
-    }
-    map_request = "http://static-maps.yandex.ru/1.x/"
-    response = requests.get(map_request, params1)
-    if not response:
-        print("Ошибка выполнения запроса:")
-        print(response)
-        print("Http статус:", response.status_code, "(", response.reason, ")")
-        sys.exit(1)
+def update_map(vz, num=0):
+    global map_file_name, login, quarter
+    direc = ''
+    is_none = ''
+    if vz:
+        direc = "maps_vz/"
+    if not vz:
+        direc = "maps_otd/"
 
-    with open(map_file, "wb") as file:
-        file.write(response.content)
-    return response
+    con = sqlite3.connect("db/fire-map_data.db")
+    cur = con.cursor()
+    result = cur.execute(f"""SELECT position_name FROM users
+    WHERE (login = '{login}')""").fetchone()
+    print(result)
+    coords = cur.execute(f"""SELECT x1 FROM positions
+    WHERE (name_position = '{result[0]}')""").fetchone()
+    con.close()
 
-
-update_map(pt)
+    if coords[0] == 0:
+        is_none = "maps_otd/None.png"
+    elif vz and num != 0:
+        print('да')
+        is_none = f"maps_otd/{coords[0][:-4]}_{quarter[num - 1]}.png"
+    else:
+        is_none = direc + coords[0]
+    map_file_name = "map.png"
+    map_file_1 = is_none
+    map_file = Image.open(map_file_1)
+    map_file.save(map_file_name, 'png')
+    return is_none
 
 
 im = Image.open("map.png")
@@ -78,11 +83,10 @@ password_line = pygame_gui.elements.UITextEntryLine(
 
 
 def show_menu():
-    global menu_manager, start
+    global menu_manager, start, login
     menu_bg = pygame.image.load('menu_bg.jpg')
     hash_password = []
     password = 'h'
-    login = 'h'
     show = True
     result = []
     while show:
@@ -102,8 +106,10 @@ def show_menu():
                             result = cur.execute(f"""SELECT position_id FROM users
                             WHERE (login = '{login}')""").fetchone()
                             con.close()
-                        if result:
-                            main_cycle(result, login, password)
+                        if result[0] == 4:
+                            select_menu()
+                        else:
+                            main_cycle(result)
 
                     else:
                         diolog_window = pygame_gui.windows.UIConfirmationDialog(
@@ -127,50 +133,41 @@ def show_menu():
         pygame.display.flip()
 
 
+select_manager = pygame_gui.UIManager((650, 450))
+btn_map_1 = pygame_gui.elements.UIButton(
+    relative_rect=pygame.Rect((250, 275), (150, 50)), text="Карта №1", manager=select_manager
+)
+
+
+def select_menu():
+    menu_bg = pygame.image.load('menu_bg.jpg')
+    show = True
+    while show:
+        time_delta = clock.tick(60) / 1000.0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == btn_map_1:
+                    con = sqlite3.connect("db/fire-map_data.db")
+                    cur = con.cursor()
+                    cur.execute(f'UPDATE positions SET x1 = "map_1.png"'
+                                f'WHERE name_position = "Командир взвода"')
+                    con.commit()
+                    con.close()
+                    main_cycle((4,))
+
+            select_manager.process_events(event)
+        select_manager.update(time_delta)
+        screen.fill((220, 220, 220))
+        screen.blit(menu_bg, (0, 0))
+        select_manager.draw_ui(screen)
+        pygame.display.flip()
+
+
 def coord_click(x, y, w, h, vz):
-    dx = x - center_py[0]
-    dx_geo = center_geo[0] + (3 * dx * sp / w)
-
-    dy = center_geo[1] - y
-    dy_geo = center_geo[1] + (0.1 * dy * sp / h)
-    if vz:
-        print('да')
-        dy_geo += (dy_geo - center_geo[1]) * 20
-        if center_geo[0] < dx_geo:
-            dx_geo -= (dx_geo - center_geo[0]) / 3.7
-        elif center_geo[0] > dx_geo:
-            dx_geo += (center_geo[0] - dx_geo) / 3.7
-    else:
-        if center_geo[1] < dy_geo:
-            dy_geo -= (dy_geo - center_geo[1]) / 7
-        elif center_geo[1] > dy_geo:
-            dy_geo -= (center_geo[1] - dy_geo) / 7
-        if center_geo[0] < dx_geo:
-            dx_geo += (dx_geo - center_geo[0]) / 15
-        elif center_geo[0] > dx_geo:
-            dx_geo -= (center_geo[0] - dx_geo) / 15
-    print(dx_geo, dy_geo)
-    return dx_geo, dy_geo
-
-
-# def coord_click_py(dx_geo, dy_geo, w, h, ssp, vz):
-#     global center_py
-#     dx = (-dx_geo + center_geo[0] + (3 * ssp / w))
-#
-#     dy = (-dy_geo + center_geo[1] + (2 * sp / h))
-#     if vz:
-#         if center_py[1] < dy:
-#             dy -= (dy - center_py[1]) / 2.5
-#
-#         elif center_py[1] > dy:
-#             dy += (center_py[1] - dy) / 3.5
-#
-#         if center_py[0] < dx:
-#             dx -= (dx - center_py[0]) / 4
-#
-#         elif center_py[0] > dx:
-#             dx += (center_py[0] - dx) / 2.7
-#     return dx, dy
+    pass
 
 
 def point_draw(vz, pos):
@@ -195,32 +192,6 @@ def point_draw(vz, pos):
                     screen.blit(image, (i[1], i[2]))
     if vz:
         pass
-        # con = sqlite3.connect("fire-map_data.db")
-        # cur = con.cursor()
-        # center_geo_ot = cur.execute(f"""SELECT x0, y0 FROM positions
-        #     WHERE id < 4""").fetchall()
-        # points_l = cur.execute(f"""SELECT point_id, x0, y0 FROM points_on_maps """).fetchall()
-        # con.close()
-        # for h in center_geo_ot:
-        #     for i in points_l:
-        #         l += 1
-        #         con = sqlite3.connect("fire-map_data.db")
-        #         cur = con.cursor()
-        #         point_name = cur.execute(f"""SELECT id, type, image_point FROM points
-        #         WHERE id = '{i[0]}'""").fetchall()
-        #         con.close()
-        #         dx_geo = coord_click(i[1], i[2], width, height, h[0], h[1], 0.0015, False, True)[0]
-        #         dy_geo = coord_click(i[1], i[2], width, height, h[0], h[1], 0.0015, False, True)[1]
-        #         fx = coord_click_py(dx_geo, dy_geo, width, height, sp, vz)[0]
-        #         fy = coord_click_py(dx_geo, dy_geo, width, height, sp, vz)[1]
-        #         print(f"GEO_X{l}:", dx_geo, "GEO_Y:", dy_geo, "FX:", fx, "FY:", fy)
-        #         if l == 6:
-        #             l = 0
-        #         for j in point_name:
-        #             if j[0] == i[0]:
-        #                 image = pygame.image.load(j[2]).convert_alpha()
-        #                 image.set_colorkey((255, 255, 255))
-        #                 screen.blit(image, (fx, fy))
 
     for i in points_list:
         if i[2] == 'РПК':
@@ -269,12 +240,11 @@ def point_draw(vz, pos):
             screen.blit(image, (i[0], i[1]))
 
 
-def main_cycle(res, login, password):
-    global run, center_geo, z, sp, pt, updating, map_file, points_list
-    a = ''
+def main_cycle(res):
+    global run, updating, map_file_name, points_list, login
     vz = False
-    x = -300
-    y = -300
+    current = 'maps_vz/'
+    num = 0
     point = ''
     con = sqlite3.connect("db/fire-map_data.db")
     cur = con.cursor()
@@ -289,20 +259,9 @@ def main_cycle(res, login, password):
             options_list=['1 отделение', '2 отделение', '3 отделение'], starting_option='',
             relative_rect=pygame.Rect((470, 50), (160, 50)), manager=manager)
         vz = True
+    update_map(vz)
     platoon = ''
     if not vz:
-        con = sqlite3.connect("db/fire-map_data.db")
-        cur = con.cursor()
-
-        result = cur.execute(f"""SELECT position_name FROM users 
-        WHERE (login = '{login}')""").fetchall()
-
-        coords = cur.execute(f"""SELECT x0, y0 FROM positions
-        WHERE (name_position = '{result[0][0]}')""").fetchall()
-        con.close()
-        center_geo[0], center_geo[1] = coords[0][0], coords[0][1]
-        z = 16
-        sp = 0.0015
         updating = True
         points = pygame_gui.elements.UIDropDownMenu(
             options_list=['РПК', 'ПК', 'крупонкалиберный', 'РПГ', 'СПГ', 'АГС', 'БМП', 'БМП с тралом', 'БТР',
@@ -310,7 +269,6 @@ def main_cycle(res, login, password):
             starting_option='',
             relative_rect=pygame.Rect((470, 50), (160, 50)), manager=manager)
     while run:
-
         time_delta = clock.tick(60) / 1000.0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -328,29 +286,22 @@ def main_cycle(res, login, password):
 
                 if event.ui_element == back:
                     if vz:
-                        if center_geo != [37.6, 55.7]:
-                            center_geo = [37.6, 55.7]
-                            z = None
-                            sp = 0.004
-                            pt = '37.6,55.7,round'
-                            updating = True
+                        num = 0
+                        updating = True
                     else:
-
-                        points_list.pop(-1)
+                        if points_list:
+                            points_list.pop(-1)
                 if event.ui_element == confirm:
                     if vz:
-                        if center_geo != [37.6, 55.7] and platoon != '':
+                        if platoon != '' and 'maps_vz/' not in current:
                             con = sqlite3.connect("db/fire-map_data.db")
                             cur = con.cursor()
-                            cur.execute(f'UPDATE positions SET x0 = {center_geo[0]}, y0 = {center_geo[1]},'
-                                        f' complited = "processed"'
+                            cur.execute(f'UPDATE positions SET x1 = "{current[9:]}", complited = "processed"'
                                         f'WHERE name_position = "Командир отделения №{platoon[0]}"')
-                            cur.execute(f'DELETE from point_on_maps WHERE position_id = {platoon[0]}')
+                            cur.execute(f'DELETE from points_on_maps WHERE position_id = {platoon[0]}')
                             con.commit()
                             con.close()
-                            center_geo = [37.6, 55.7]
-                            z = None
-                            sp = 0.004
+                            num = 0
                             updating = True
                     if not vz:
                         con = sqlite3.connect("db/fire-map_data.db")
@@ -370,11 +321,15 @@ def main_cycle(res, login, password):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if center_geo[0] == 37.6 and center_geo[1] == 55.7 and x <= 450 and vz:
-                    center_geo[0] = coord_click(x, y, width, height, True)[0]
-                    center_geo[1] = coord_click(x, y, width, height, True)[1]
-                    z = 16
-                    sp = 0.0015
+                if x <= 450 and vz:
+                    if x > center_py[0] and y < center_py[1]:
+                        num = 1
+                    elif x < center_py[0] and y < center_py[1]:
+                        num = 2
+                    elif x < center_py[0] and y > center_py[1]:
+                        num = 3
+                    else:
+                        num = 4
                     updating = True
                 elif x <= 450 and not vz:
                     if point:
@@ -382,11 +337,11 @@ def main_cycle(res, login, password):
             manager.process_events(event)
 
         if updating:
-            update_map(pt)
+            current = update_map(vz, num)
             updating = False
         manager.update(time_delta)
         screen.fill((220, 220, 220))
-        screen.blit(pygame.image.load(map_file), (0, 0))
+        screen.blit(pygame.image.load(map_file_name), (0, 0))
         manager.draw_ui(screen)
 
         point_draw(vz, res[0])
